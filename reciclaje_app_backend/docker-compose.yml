@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  db:
+    image: postgres:14.3
+    restart: always
+    ports:
+      - "7890:7890"
+    environment:
+      POSTGRES_PASSWORD: ${pass}
+      POSTGRES_DB: ${name}
+    container_name: reciclaje-app
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
