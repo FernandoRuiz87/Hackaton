@@ -7,9 +7,13 @@ import { CompanyWasteTypeModule } from "./company-waste-type/company-waste-type.
 import { TrashBinModule } from "./trash-bin/trash-bin.module";
 import { BinWasteTypeModule } from "./bin-waste-type/bin-waste-type.module";
 import { CollectionModule } from "./collection/collection.module";
+import { ConfigModule } from "@nestjs/config";
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: "postgres",
       host: process.env.host,
