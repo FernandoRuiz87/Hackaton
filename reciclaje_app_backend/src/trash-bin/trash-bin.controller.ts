@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { TrashBinService } from './trash-bin.service';
 import { CreateTrashBinDto } from './dto/create-trash-bin.dto';
 import { UpdateTrashBinDto } from './dto/update-trash-bin.dto';
@@ -18,17 +27,20 @@ export class TrashBinController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.trashBinService.findOne(+id);
+  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.trashBinService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTrashBinDto: UpdateTrashBinDto) {
-    return this.trashBinService.update(+id, updateTrashBinDto);
+  update(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() updateTrashBinDto: UpdateTrashBinDto,
+  ) {
+    return this.trashBinService.update(id, updateTrashBinDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.trashBinService.remove(+id);
+  remove(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.trashBinService.remove(id);
   }
 }

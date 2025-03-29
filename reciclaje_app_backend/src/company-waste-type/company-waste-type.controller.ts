@@ -1,15 +1,26 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { CompanyWasteTypeService } from './company-waste-type.service';
 import { CreateCompanyWasteTypeDto } from './dto/create-company-waste-type.dto';
 import { UpdateCompanyWasteTypeDto } from './dto/update-company-waste-type.dto';
 
 @Controller('company-waste-type')
 export class CompanyWasteTypeController {
-  constructor(private readonly companyWasteTypeService: CompanyWasteTypeService) {}
+  constructor(
+    private readonly companyWasteTypeService: CompanyWasteTypeService,
+  ) {}
 
   @Post()
-  create(@Body() createCompanyWasteTypeDto: CreateCompanyWasteTypeDto) {
-    return this.companyWasteTypeService.create(createCompanyWasteTypeDto);
+  create(@Body() dto: CreateCompanyWasteTypeDto) {
+    return this.companyWasteTypeService.create(dto);
   }
 
   @Get()
@@ -17,18 +28,28 @@ export class CompanyWasteTypeController {
     return this.companyWasteTypeService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.companyWasteTypeService.findOne(+id);
+  @Get(':companyId/:wasteTypeId')
+  findOne(
+    @Param('companyId', new ParseUUIDPipe()) companyId: string,
+    @Param('wasteTypeId', new ParseUUIDPipe()) wasteTypeId: string,
+  ) {
+    return this.companyWasteTypeService.findOne(companyId, wasteTypeId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCompanyWasteTypeDto: UpdateCompanyWasteTypeDto) {
-    return this.companyWasteTypeService.update(+id, updateCompanyWasteTypeDto);
+  @Patch(':companyId/:wasteTypeId')
+  update(
+    @Param('companyId', new ParseUUIDPipe()) companyId: string,
+    @Param('wasteTypeId', new ParseUUIDPipe()) wasteTypeId: string,
+    @Body() dto: UpdateCompanyWasteTypeDto,
+  ) {
+    return this.companyWasteTypeService.update(companyId, wasteTypeId, dto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.companyWasteTypeService.remove(+id);
+  @Delete(':companyId/:wasteTypeId')
+  remove(
+    @Param('companyId', new ParseUUIDPipe()) companyId: string,
+    @Param('wasteTypeId', new ParseUUIDPipe()) wasteTypeId: string,
+  ) {
+    return this.companyWasteTypeService.remove(companyId, wasteTypeId);
   }
 }

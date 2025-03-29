@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { WasteTypeService } from './waste-type.service';
 import { CreateWasteTypeDto } from './dto/create-waste-type.dto';
 import { UpdateWasteTypeDto } from './dto/update-waste-type.dto';
@@ -18,17 +27,20 @@ export class WasteTypeController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.wasteTypeService.findOne(+id);
+  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.wasteTypeService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateWasteTypeDto: UpdateWasteTypeDto) {
-    return this.wasteTypeService.update(+id, updateWasteTypeDto);
+  update(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() updateWasteTypeDto: UpdateWasteTypeDto,
+  ) {
+    return this.wasteTypeService.update(id, updateWasteTypeDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.wasteTypeService.remove(+id);
+  remove(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.wasteTypeService.remove(id);
   }
 }

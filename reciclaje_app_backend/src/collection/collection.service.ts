@@ -1,26 +1,49 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Collection } from './entities/collection.entity';
 import { CreateCollectionDto } from './dto/create-collection.dto';
 import { UpdateCollectionDto } from './dto/update-collection.dto';
 
 @Injectable()
 export class CollectionService {
-  create(createCollectionDto: CreateCollectionDto) {
-    return 'This action adds a new collection';
+  constructor(
+    @InjectRepository(Collection)
+    private readonly collectionRepository: Repository<Collection>,
+  ) {}
+
+  async create(dto: CreateCollectionDto): Promise<Collection> {
+    const collection = this.collectionRepository.create(dto);
+    return await this.collectionRepository.save(collection);
   }
 
-  findAll() {
-    return `This action returns all collection`;
+  async findAll(): Promise<Collection[]> {
+    return await this.collectionRepository.find({
+      relations: ['user', 'bin'], // si necesitas incluir relaciones
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} collection`;
+  async findOne(id: string): Promise<Collection> {
+    const collection = await this.collectionRepository.findOne({
+      where: { collectionId: id },
+      relations: ['user', 'bin'], // si aplican
+    });
+
+    if (!collection) {
+      throw new NotFoundException(`Collection with ID "${id}" not found`);
+    }
+
+    return collection;
   }
 
-  update(id: number, updateCollectionDto: UpdateCollectionDto) {
-    return `This action updates a #${id} collection`;
+  async update(id: string, dto: UpdateCollectionDto): Promise<Collection> {
+    const collection = await this.findOne(id);
+    Object.assign(collection, dto);
+    return await this.collectionRepository.save(collection);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} collection`;
+  async remove(id: string): Promise<void> {
+    const collection = await this.findOne(id);
+    await this.collectionRepository.remove(collection);
   }
 }

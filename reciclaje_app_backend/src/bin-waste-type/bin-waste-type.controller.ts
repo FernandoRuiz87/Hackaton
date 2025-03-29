@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { BinWasteTypeService } from './bin-waste-type.service';
 import { CreateBinWasteTypeDto } from './dto/create-bin-waste-type.dto';
 import { UpdateBinWasteTypeDto } from './dto/update-bin-waste-type.dto';
@@ -17,18 +26,28 @@ export class BinWasteTypeController {
     return this.binWasteTypeService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.binWasteTypeService.findOne(+id);
+  @Get(':binId/:wasteTypeId')
+  findOne(
+    @Param('binId', new ParseUUIDPipe()) binId: string,
+    @Param('wasteTypeId', new ParseUUIDPipe()) wasteTypeId: string,
+  ) {
+    return this.binWasteTypeService.findOne(binId, wasteTypeId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBinWasteTypeDto: UpdateBinWasteTypeDto) {
-    return this.binWasteTypeService.update(+id, updateBinWasteTypeDto);
+  @Patch(':binId/:wasteTypeId')
+  update(
+    @Param('binId', new ParseUUIDPipe()) binId: string,
+    @Param('wasteTypeId', new ParseUUIDPipe()) wasteTypeId: string,
+    @Body() dto: UpdateBinWasteTypeDto,
+  ) {
+    return this.binWasteTypeService.update(binId, wasteTypeId, dto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.binWasteTypeService.remove(+id);
+  @Delete(':binId/:wasteTypeId')
+  remove(
+    @Param('binId', new ParseUUIDPipe()) binId: string,
+    @Param('wasteTypeId', new ParseUUIDPipe()) wasteTypeId: string,
+  ) {
+    return this.binWasteTypeService.remove(binId, wasteTypeId);
   }
 }
