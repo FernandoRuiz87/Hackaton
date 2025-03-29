@@ -1,10 +1,10 @@
 # ♻️ Proyecto Reciclaje Inteligente
 
-#María Fernanda Martínez May
-#Ángel Gabriel Paulin Azpilcueta 
-#Juan Fernando Ruiz Jiménez
-#Luis Joel Alvarez Rojas
-#Valeria Ixchel Ramírez Rodríguez
+# María Fernanda Martínez May
+# Ángel Gabriel Paulin Azpilcueta 
+# Juan Fernando Ruiz Jiménez
+# Luis Joel Alvarez Rojas
+# Valeria Ixchel Ramírez Rodríguez
 
 
 
