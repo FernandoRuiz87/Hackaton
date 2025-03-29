@@ -1,13 +1,5 @@
 # ♻️ Proyecto Reciclaje Inteligente
 
-* María Fernanda Martínez May
-* Ángel Gabriel Paulin Azpilcueta 
-* Juan Fernando Ruiz Jiménez
-* Luis Joel Alvarez Rojas
-* Valeria Ixchel Ramírez Rodríguez
-
-
-
 Este proyecto es un sistema integral para la gestión del reciclaje, compuesto por cuatro módulos principales:
 
 1. **📱 Aplicación móvil (Flutter/Dart)**
@@ -108,3 +100,9 @@ Proyecto_Reciclaje/
 ## 👥 Equipo
 
 Este proyecto fue desarrollado para una hackatón por el equipo CBE
+* María Fernanda Martínez May
+* Ángel Gabriel Paulin Azpilcueta 
+* Juan Fernando Ruiz Jiménez
+* Luis Joel Alvarez Rojas
+* Valeria Ixchel Ramírez Rodríguez
+
