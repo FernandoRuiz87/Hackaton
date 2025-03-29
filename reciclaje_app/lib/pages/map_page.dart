@@ -25,6 +25,7 @@ class MapPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               // El TextButton y el Text se mantienen centrados
+              Image.asset("assets/images/mapa-queretaro.jpg"),
               Center(
                 child: TextButton(
                   onPressed: () {},

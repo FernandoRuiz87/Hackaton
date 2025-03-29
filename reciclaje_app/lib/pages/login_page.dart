@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:reciclaje_app/pages/widgets/common_widgets.dart';
-import 'package:reciclaje_app/services/api_services.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,33 +12,18 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  Future<void> _login() async {
-    final apiService = ApiService();
+  void _login() {
     final email = emailController.text;
-    // final password = passwordController.text;
+    final password = passwordController.text;
 
-    try {
-      final response = await apiService.postData('users', {
-        'email': email,
-        // 'password': password,
-      });
-
-      if (response['success'] == true) {
-        Navigator.pushNamed(context, 'home_page');
-      } else if (response[500] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Usuario y/o contraseña incorrectos')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(response['message'] ?? 'Error al iniciar sesión'),
-          ),
-        );
-      }
-    } catch (e) {
+    if (email.isNotEmpty && password.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al conectar con el servidor: $e')),
+        SnackBar(content: Text('Inicio de sesión simulado para $email')),
+      );
+      Navigator.pushNamed(context, 'home_page');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Por favor, complete todos los campos.')),
       );
     }
   }
