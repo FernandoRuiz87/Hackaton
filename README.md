@@ -4,7 +4,7 @@
 * Ángel Gabriel Paulin Azpilcueta 
 * Juan Fernando Ruiz Jiménez
 * Luis Joel Alvarez Rojas
-** Valeria Ixchel Ramírez Rodríguez
+* Valeria Ixchel Ramírez Rodríguez
 
 
 
