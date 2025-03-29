@@ -6,6 +6,9 @@
   <title>QRos - Rutas</title>
   <script src="https://unpkg.com/lucide@latest"></script>
 
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; display: flex; min-height: 100vh; }
@@ -163,18 +166,11 @@
       display: block;
     }
 
-    .mapa {
-      flex: 2;
-      height: 400px;
-      border-radius: 10px;
-      background-color: #eee;
-    }
-
     .acciones {
       display: flex;
       justify-content: flex-end;
       gap: 10px;
-      margin-bottom: 20px;
+      margin: 20px 0;
     }
 
     .acciones button {
@@ -192,6 +188,14 @@
     .btn-agregar {
       background-color: #6b85e0;
       color: white;
+    }
+
+    #map-rutas {
+      width: 100%;
+      height: 400px;
+      margin-top: 20px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
@@ -216,16 +220,15 @@
 
   <!-- Contenido -->
   <div class="content">
-    <!-- Topbar -->
     <div class="topbar">
-        <input type="text" placeholder="Buscar..." />
-        <div class="top-right">
-          <button class="notif-btn" id="notifToggle" title="Notificaciones"><i data-lucide="bell"></i></button>
-          <div class="notification-popup" id="notificationPopup">
-            <div class="notification-item">✅ Iniciaste sesión correctamente</div>
-            <div class="notification-item">📢 Nueva actualización disponible</div>
-            <div class="notification-item">📦 3 contenedores nuevos registrados</div>
-          </div>
+      <input type="text" placeholder="Buscar..." />
+      <div class="top-right">
+        <button class="notif-btn" id="notifToggle" title="Notificaciones"><i data-lucide="bell"></i></button>
+        <div class="notification-popup" id="notificationPopup">
+          <div class="notification-item">✅ Iniciaste sesión correctamente</div>
+          <div class="notification-item">📢 Nueva actualización disponible</div>
+          <div class="notification-item">📦 3 contenedores nuevos registrados</div>
+        </div>
         <div class="user-wrapper">
           <div class="user-info" id="toggleUserOptions">
             <i data-lucide="user"></i>
@@ -241,14 +244,9 @@
       </div>
     </div>
 
-    <!-- Main -->
     <div class="main">
       <h1>Rutas</h1>
 
-      <div class="acciones">
-        <button class="btn-eliminar">Eliminar</button>
-        <button class="btn-agregar">Agregar</button>
-      </div>
 
       <div class="rutas-container">
         <div class="rutas-lista">
@@ -264,15 +262,20 @@
             <span>26 Marzo 2025</span>
           </div>
         </div>
-
-        <div class="mapa" id="mapa">
-          <!-- Aquí se puede insertar Google Maps si se desea -->
-        </div>
       </div>
+
+      <!-- NUEVO MAPA INTERACTIVO -->
+      <h2>Crear nueva ruta</h2>
+      <div class="acciones">
+        <button id="new-route">Nueva Ruta</button>
+        <button id="clear">Limpiar</button>
+      </div>
+      <div id="map-rutas"></div>
     </div>
   </div>
 
   <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
     lucide.createIcons();
 
@@ -287,6 +290,71 @@
       if (!toggleUser.contains(e.target) && !userMenu.contains(e.target)) {
         userMenu.style.display = "none";
       }
+    });
+
+    // Mapa Leaflet
+    const map = L.map('map-rutas').setView([20.5888, -100.3899], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    let creatingRoute = false;
+    let startPoint = null;
+    let endPoint = null;
+    let tempMarkers = [];
+    let tempLine = null;
+
+    document.getElementById('new-route').addEventListener('click', () => {
+      if (creatingRoute) {
+        alert('Ya estás creando una ruta.');
+        return;
+      }
+      creatingRoute = true;
+      startPoint = null;
+      endPoint = null;
+      clearTempItems();
+      alert('Haz clic en el mapa para seleccionar el punto de inicio.');
+      map.getContainer().style.cursor = 'crosshair';
+    });
+
+    map.on('click', function(e) {
+      if (!creatingRoute) return;
+
+      if (!startPoint) {
+        startPoint = e.latlng;
+        tempMarkers.push(L.marker(startPoint, {
+          icon: L.divIcon({ className: 'start-icon', html: '🟢', iconSize: [24, 24] })
+        }).addTo(map));
+        alert('Ahora haz clic para marcar el punto final.');
+      } else {
+        endPoint = e.latlng;
+        tempMarkers.push(L.marker(endPoint, {
+          icon: L.divIcon({ className: 'end-icon', html: '🔴', iconSize: [24, 24] })
+        }).addTo(map));
+
+        tempLine = L.polyline([startPoint, endPoint], { color: 'blue', weight: 5 }).addTo(map);
+
+        const routeName = prompt('Nombre de la ruta:', 'Nueva Ruta');
+        if (routeName) {
+          alert('Ruta "' + routeName + '" creada.');
+        }
+
+        creatingRoute = false;
+        map.getContainer().style.cursor = '';
+      }
+    });
+
+    function clearTempItems() {
+      if (tempLine) map.removeLayer(tempLine);
+      tempMarkers.forEach(m => map.removeLayer(m));
+      tempMarkers = [];
+      tempLine = null;
+    }
+
+    document.getElementById('clear').addEventListener('click', () => {
+      creatingRoute = false;
+      clearTempItems();
+      map.getContainer().style.cursor = '';
     });
   </script>
 </body>
