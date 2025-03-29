@@ -11,7 +11,7 @@ export class CollectionService {
     @InjectRepository(Collection)
     private readonly collectionRepository: Repository<Collection>,
   ) {}
-
+  
   async create(dto: CreateCollectionDto): Promise<Collection> {
     const collection = this.collectionRepository.create(dto);
     return await this.collectionRepository.save(collection);
