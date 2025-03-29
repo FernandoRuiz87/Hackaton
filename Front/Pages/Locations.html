@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QRos - Ubicaciones</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; display: flex; min-height: 100vh; }
+
+    .sidebar {
+      width: 240px;
+      background-color: #e6ecfb;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .sidebar img {
+      width: 200px;
+      display: block;
+      margin: 0 auto 40px;
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+      text-decoration: none;
+      color: #000;
+      font-weight: bold;
+      padding: 8px 10px;
+      border-radius: 6px;
+      transition: background 0.2s ease;
+    }
+
+    .sidebar a:hover {
+      background-color: #d5defa;
+    }
+
+    .nav-links, .bottom-links {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bottom-links {
+      margin-top: 60px;
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      border-bottom: 1px solid #ccc;
+      background-color: #ffffff;
+    }
+
+    .topbar input[type="text"] {
+      width: 300px;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+
+    .top-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      position: relative;
+    }
+
+    .notif-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .user-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .username {
+      margin-right: 2px;
+    }
+
+    .user-options {
+      display: none;
+      position: absolute;
+      top: 120%;
+      right: 0;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      min-width: 180px;
+      z-index: 200;
+    }
+
+    .user-options a {
+      display: block;
+      padding: 10px 16px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      border-bottom: 1px solid #eee;
+    }
+
+    .user-options a:hover {
+      background-color: #f2f2f2;
+    }
+
+    .main {
+      padding: 40px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      color: #002b00;
+    }
+
+    .locations-container {
+      display: flex;
+      gap: 30px;
+    }
+
+    .location-list {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .location {
+      border-bottom: 1px solid #aaa;
+      padding-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .location-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    .date {
+      font-size: 0.9rem;
+      color: #555;
+      margin-left: 26px;
+    }
+
+    .color-dots {
+      display: flex;
+      gap: 6px;
+      margin-left: 26px;
+    }
+
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+    }
+
+    .dot.red { background-color: red; }
+    .dot.yellow { background-color: gold; }
+    .dot.green { background-color: green; }
+    .dot.blue { background-color: royalblue; }
+    .dot.brown { background-color: brown; }
+
+    .arrow {
+      margin-left: auto;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .map {
+      flex: 1.5;
+      height: 500px;
+      background-color: #eee;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .buttons {
+      margin-top: 30px;
+      display: flex;
+      gap: 20px;
+    }
+
+    .buttons button {
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+    }
+
+    .add-btn {
+      background-color: #8fa9e2;
+      color: white;
+    }
+
+    .enter-btn {
+      background-color: #7cab7c;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="nav-links">
+      <img src="../assets/QroS-1.png" alt="QRos Logo">
+      <a href="PrincipalPage.html"><i data-lucide="home"></i> Página principal</a>
+      <a href="Locations.html"><i data-lucide="map-pin"></i> Ubicaciones</a>
+      <a href="Analytics.html"><i data-lucide="line-chart"></i> Analítica</a>
+      <a href="Container.html"><i data-lucide="trash-2"></i> Contenedores</a>
+      <a href="Routes.html"><i data-lucide="route"></i> Rutas</a>
+      <a href="Guide.html"><i data-lucide="book-open"></i> Guía</a>
+    </div>
+    <div class="bottom-links">
+      <a href="Help.html"><i data-lucide="help-circle"></i> Ayuda</a>
+      <a href="Configurations.html"><i data-lucide="settings"></i> Configuración</a>
+    </div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="content">
+    <!-- Topbar -->
+    <div class="topbar">
+        <input type="text" placeholder="Buscar..." />
+        <div class="top-right">
+          <button class="notif-btn" id="notifToggle" title="Notificaciones"><i data-lucide="bell"></i></button>
+          <div class="notification-popup" id="notificationPopup">
+            <div class="notification-item">✅ Iniciaste sesión correctamente</div>
+            <div class="notification-item">📢 Nueva actualización disponible</div>
+            <div class="notification-item">📦 3 contenedores nuevos registrados</div>
+          </div>
+        <div class="user-wrapper">
+          <div class="user-info" id="toggleUserOptions">
+            <i data-lucide="user"></i>
+            <span class="username">Usuario82823</span>
+            <i data-lucide="chevron-down"></i>
+          </div>
+          <div class="user-options" id="userOptions">
+            <a href="Login.html">Cerrar sesión</a>
+            <a href="Term.html">Términos y Condiciones</a>
+            <a href="Profile.html">Mi perfil</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+      <h1>Ubicaciones</h1>
+      <div class="locations-container">
+        <!-- Lista de ubicaciones -->
+        <div class="location-list">
+          <div class="location">
+            <div class="location-title">
+              <i data-lucide="map-pin" style="color: red;"></i>
+              76267 Saldarriaga, Qro...
+              <span class="arrow">›</span>
+            </div>
+            <div class="date">28 Marzo 2025</div>
+            <div class="color-dots">
+              <div class="dot green"></div>
+              <div class="dot yellow"></div>
+              <div class="dot blue"></div>
+              <div class="dot brown"></div>
+            </div>
+          </div>
+
+          <div class="location">
+            <div class="location-title">
+              <i data-lucide="map-pin" style="color: red;"></i>
+              76267 Hacienda Cerro Gordo...
+              <span class="arrow">›</span>
+            </div>
+            <div class="date">26 Marzo 2025</div>
+            <div class="color-dots">
+              <div class="dot green"></div>
+              <div class="dot yellow"></div>
+              <div class="dot blue"></div>
+            </div>
+          </div>
+
+          <div class="location">
+            <div class="location-title">
+              <i data-lucide="map-pin" style="color: red;"></i>
+              76267 Hacienda de Los Arados
+              <span class="arrow">›</span>
+            </div>
+            <div class="date">26 Marzo 2025</div>
+            <div class="color-dots">
+              <div class="dot red"></div>
+              <div class="dot yellow"></div>
+              <div class="dot green"></div>
+            </div>
+          </div>
+
+          <div class="buttons">
+            <button class="add-btn">Agregar</button>
+            <button class="enter-btn">Entrar</button>
+          </div>
+        </div>
+
+        <!-- Mapa -->
+        <div class="map" id="map">
+          <!-- Aquí va Google Maps -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script>
+    lucide.createIcons();
+
+    const toggleUser = document.getElementById("toggleUserOptions");
+    const userMenu = document.getElementById("userOptions");
+
+    toggleUser.addEventListener("click", () => {
+      userMenu.style.display = userMenu.style.display === "block" ? "none" : "block";
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!toggleUser.contains(e.target) && !userMenu.contains(e.target)) {
+        userMenu.style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>
