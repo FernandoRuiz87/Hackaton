@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QRos - Ubicaciones</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v7.3.0/ol.css">
+  <script src="https://cdn.jsdelivr.net/npm/ol@v7.3.0/dist/ol.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; display: flex; min-height: 100vh; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 240px;
+      background-color: #e6ecfb;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .sidebar img {
+      width: 200px;
+      display: block;
+      margin: 0 auto 40px;
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+      text-decoration: none;
+      color: #000;
+      font-weight: bold;
+      padding: 8px 10px;
+      border-radius: 6px;
+      transition: background 0.2s ease;
+    }
+
+    .sidebar a:hover {
+      background-color: #d5defa;
+    }
+
+    .nav-links, .bottom-links {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bottom-links {
+      margin-top: 60px;
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* TOPBAR */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      border-bottom: 1px solid #ccc;
+      background-color: #ffffff;
+    }
+
+    .topbar input[type="text"] {
+      width: 300px;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+
+    .top-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      position: relative;
+    }
+
+    .notif-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .notification-popup {
+      display: none;
+      position: absolute;
+      top: 40px;
+      right: 50px;
+      width: 280px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      z-index: 150;
+    }
+
+    .notification-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid #eee;
+      font-size: 0.95rem;
+      color: #333;
+    }
+
+    .notification-item:last-child {
+      border-bottom: none;
+    }
+
+    .notification-item:hover {
+      background-color: #f5f5f5;
+      cursor: pointer;
+    }
+
+    .user-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: bold;
+    }
+
+    .username {
+      margin-right: 4px;
+    }
+
+    .user-options {
+      display: none;
+      position: absolute;
+      top: 120%;
+      right: 0;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      min-width: 180px;
+      z-index: 200;
+    }
+
+    .user-options a {
+      display: block;
+      padding: 10px 16px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      border-bottom: 1px solid #eee;
+    }
+
+    .user-options a:hover {
+      background-color: #f2f2f2;
+    }
+
+    .user-options a:last-child {
+      border-bottom: none;
+    }
+
+    .main {
+      padding: 40px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #104410;
+      margin-bottom: 20px;
+    }
+
+    .location-card {
+      border-bottom: 1px solid #ccc;
+      padding: 12px 0;
+      cursor: pointer;
+    }
+
+    .location-card h3 {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .location-card .icons {
+      margin-top: 4px;
+    }
+
+    .location-card .icons span {
+      margin-right: 6px;
+      font-size: 1.2rem;
+    }
+
+    .location-card .icons span.green { color: green; }
+    .location-card .icons span.red { color: red; }
+    .location-card .icons span.blue { color: blue; }
+    .location-card .icons span.yellow { color: goldenrod; }
+    .location-card .icons span.purple { color: purple; }
+
+    .actions {
+      margin-top: 20px;
+      display: flex;
+      gap: 15px;
+    }
+
+    .actions button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .actions .add-btn {
+      background-color: #7d8fe7;
+      color: white;
+    }
+
+    .actions .enter-btn {
+      background-color: #6dad6b;
+      color: white;
+    }
+
+    #map {
+      width: 100%;
+      height: 400px;
+      margin-top: 30px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="nav-links">
+      <img src="../assets/QroS-1.png" alt="Logo QRos">
+      <a href="PrincipalPage.html"><i data-lucide="home"></i> Página principal</a>
+      <a href="Locations.html"><i data-lucide="map-pin"></i> Ubicaciones</a>
+      <a href="Analytics.html"><i data-lucide="line-chart"></i> Analítica</a>
+      <a href="Container.html"><i data-lucide="trash-2"></i> Contenedores</a>
+      <a href="Routes.html"><i data-lucide="route"></i> Rutas</a>
+      <a href="Guide.html"><i data-lucide="book-open"></i> Guía</a>
+    </div>
+    <div class="bottom-links">
+      <a href="Help.html"><i data-lucide="help-circle"></i> Ayuda</a>
+      <a href="Configurations.html"><i data-lucide="settings"></i> Configuración</a>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <input type="text" placeholder="Buscar..." />
+      <div class="top-right">
+        <button class="notif-btn" id="notifToggle"><i data-lucide="bell"></i></button>
+        <div class="notification-popup" id="notificationPopup">
+          <div class="notification-item">✅ Iniciaste sesión correctamente</div>
+          <div class="notification-item">📢 Nueva actualización disponible</div>
+          <div class="notification-item">📦 Nuevos contenedores registrados</div>
+        </div>
+        <div class="user-wrapper">
+          <div class="user-info" id="toggleUserOptions">
+            <i data-lucide="user"></i>
+            <span class="username">Usuario82823</span>
+            <i data-lucide="chevron-down"></i>
+          </div>
+          <div class="user-options" id="userOptions">
+            <a href="Login.html">Cerrar sesión</a>
+            <a href="Term.html">Términos y Condiciones</a>
+            <a href="Profile.html">Mi perfil</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+      <h1>Ubicaciones</h1>
+
+      <div class="location-card">
+        <h3>📍 76267 Saldarriaga, Qro...</h3>
+        <p>28 Marzo 2025</p>
+        <div class="icons">
+          <span class="green">●</span>
+          <span class="yellow">●</span>
+          <span class="blue">●</span>
+          <span class="purple">●</span>
+        </div>
+      </div>
+
+      <div class="location-card">
+        <h3>📍 76267 Hacienda Cerro Gordo...</h3>
+        <p>26 Marzo 2025</p>
+        <div class="icons">
+          <span class="green">●</span>
+          <span class="blue">●</span>
+          <span class="yellow">●</span>
+        </div>
+      </div>
+
+      <div class="location-card">
+        <h3>📍 76267 Hacienda de Los Arados</h3>
+        <p>26 Marzo 2025</p>
+        <div class="icons">
+          <span class="red">●</span>
+          <span class="yellow">●</span>
+          <span class="green">●</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="add-btn">Agregar</button>
+        <button class="enter-btn">Entrar</button>
+      </div>
+
+      <div id="map"></div>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    const toggleUser = document.getElementById("toggleUserOptions");
+    const userMenu = document.getElementById("userOptions");
+    toggleUser.addEventListener("click", () => {
+      userMenu.style.display = userMenu.style.display === "block" ? "none" : "block";
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!toggleUser.contains(e.target) && !userMenu.contains(e.target)) {
+        userMenu.style.display = "none";
+      }
+    });
+
+    const notifToggle = document.getElementById("notifToggle");
+    const notifPopup = document.getElementById("notificationPopup");
+
+    notifToggle.addEventListener("click", () => {
+      notifPopup.style.display = notifPopup.style.display === "block" ? "none" : "block";
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!notifToggle.contains(e.target) && !notifPopup.contains(e.target)) {
+        notifPopup.style.display = "none";
+      }
+    });
+
+    // MAPA
+    const map = new ol.Map({
+      target: 'map',
+      layers: [
+        new ol.layer.Tile({
+          source: new ol.source.OSM()
+        })
+      ],
+      view: new ol.View({
+        center: ol.proj.fromLonLat([-100.3851, 20.7099]),
+        zoom: 13
+      })
+    });
+
+    const locations = [
+      { name: "Saldarriaga", coords: [-100.3851, 20.7099] },
+      { name: "Cerro Gordo", coords: [-100.3700, 20.7150] },
+      { name: "Los Arados", coords: [-100.3950, 20.7000] }
+    ];
+
+    locations.forEach(loc => {
+      const marker = new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat(loc.coords))
+      });
+
+      const layer = new ol.layer.Vector({
+        source: new ol.source.Vector({
+          features: [marker]
+        })
+      });
+
+      map.addLayer(layer);
+    });
+  </script>
+</body>
+</html>
