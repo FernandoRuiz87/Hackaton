@@ -77,6 +77,7 @@ Proyecto_Reciclaje/
   python trash_api.py
   ```
 
+
 ---
 
 ## 🔗 Integración entre Módulos
@@ -94,6 +95,7 @@ Proyecto_Reciclaje/
 - Flutter SDK (para la app móvil)
 - Navegador Web (para el frontend)
 - Docker (opcional para backend)
+- .env con Api Key de Open IA (necesario para usar `trash_api.py` , Clasificación de Residuos
 
 ---
 
