@@ -88,6 +88,94 @@
       background: none;
       border: none;
       cursor: pointer;
+      position: relative;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: #ff4757;
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .notification-popup {
+      display: none;
+      position: absolute;
+      top: 120%;
+      right: 0;
+      width: 300px;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 150;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .notification-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid #eee;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #f9f9f9;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .notification-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid #eee;
+      font-size: 0.9rem;
+      color: #333;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .notification-item:last-child {
+      border-bottom: none;
+    }
+
+    .notification-item:hover {
+      background-color: #f5f9ff;
+      cursor: pointer;
+    }
+
+    .notification-time {
+      font-size: 0.75rem;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    .notification-icon {
+      font-size: 1.1rem;
+      margin-top: 2px;
+    }
+
+    .notification-content {
+      flex: 1;
+    }
+
+    .notification-footer {
+      padding: 10px;
+      text-align: center;
+      border-top: 1px solid #eee;
+      font-size: 0.85rem;
+    }
+
+    .notification-footer a {
+      color: #4a89dc;
+      text-decoration: none;
     }
 
     .user-wrapper {
@@ -223,11 +311,39 @@
     <div class="topbar">
       <input type="text" placeholder="Buscar..." />
       <div class="top-right">
-        <button class="notif-btn" id="notifToggle" title="Notificaciones"><i data-lucide="bell"></i></button>
+        <button class="notif-btn" id="notifToggle" title="Notificaciones">
+          <i data-lucide="bell"></i>
+          <span class="notification-badge">3</span>
+        </button>
         <div class="notification-popup" id="notificationPopup">
-          <div class="notification-item">✅ Iniciaste sesión correctamente</div>
-          <div class="notification-item">📢 Nueva actualización disponible</div>
-          <div class="notification-item">📦 3 contenedores nuevos registrados</div>
+          <div class="notification-header">
+            <span>Notificaciones</span>
+            <span style="font-size: 0.8rem; color: #666;">3 nuevas</span>
+          </div>
+          <div class="notification-item">
+            <span class="notification-icon">✅</span>
+            <div class="notification-content">
+              <div>Iniciaste sesión correctamente</div>
+              <div class="notification-time">Hace 2 horas</div>
+            </div>
+          </div>
+          <div class="notification-item">
+            <span class="notification-icon">📢</span>
+            <div class="notification-content">
+              <div>Nueva actualización disponible</div>
+              <div class="notification-time">Hace 1 día</div>
+            </div>
+          </div>
+          <div class="notification-item">
+            <span class="notification-icon">📦</span>
+            <div class="notification-content">
+              <div>3 contenedores nuevos registrados</div>
+              <div class="notification-time">Hace 2 días</div>
+            </div>
+          </div>
+          <div class="notification-footer">
+            <a href="#">Ver todas las notificaciones</a>
+          </div>
         </div>
         <div class="user-wrapper">
           <div class="user-info" id="toggleUserOptions">
@@ -246,7 +362,6 @@
 
     <div class="main">
       <h1>Rutas</h1>
-
 
       <div class="rutas-container">
         <div class="rutas-lista">
@@ -290,6 +405,30 @@
       if (!toggleUser.contains(e.target) && !userMenu.contains(e.target)) {
         userMenu.style.display = "none";
       }
+    });
+
+    // Notificaciones
+    const notifToggle = document.getElementById("notifToggle");
+    const notificationPopup = document.getElementById("notificationPopup");
+
+    notifToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      notificationPopup.style.display = notificationPopup.style.display === "block" ? "none" : "block";
+      userMenu.style.display = "none"; // Cierra menú usuario si está abierto
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!notifToggle.contains(e.target) && !notificationPopup.contains(e.target)) {
+        notificationPopup.style.display = "none";
+      }
+    });
+
+    // Cerrar notificaciones al hacer clic en una
+    document.querySelectorAll('.notification-item').forEach(item => {
+      item.addEventListener('click', () => {
+        notificationPopup.style.display = "none";
+        // Aquí podrías marcar como leída, etc.
+      });
     });
 
     // Mapa Leaflet

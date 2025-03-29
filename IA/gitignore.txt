@@ -1,0 +1,21 @@
+# Entornos virtuales comunes
+venv/
+env/
+.venv/
+.env/
+
+# Archivos de Python bytecode
+__pycache__/
+*.py[cod]
+
+# Configs y backups
+*.log
+*.bak
+*.swp
+
+# Archivos de VS Code
+.vscode/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db

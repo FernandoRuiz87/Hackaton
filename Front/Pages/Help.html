@@ -84,6 +84,52 @@
       background: none;
       border: none;
       cursor: pointer;
+      position: relative;
+    }
+
+    /* ESTILOS CORREGIDOS PARA NOTIFICACIONES */
+    .notification-popup {
+      display: none;
+      position: absolute;
+      top: 120%;
+      right: 0;
+      width: 280px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      z-index: 150;
+    }
+
+    .notification-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid #eee;
+      font-size: 0.95rem;
+      color: #333;
+    }
+
+    .notification-item:last-child {
+      border-bottom: none;
+    }
+
+    .notification-item:hover {
+      background-color: #f5f5f5;
+      cursor: pointer;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: #ff4757;
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .user-wrapper {
@@ -231,7 +277,10 @@
     <div class="topbar">
         <input type="text" placeholder="Buscar..." />
         <div class="top-right">
-          <button class="notif-btn" id="notifToggle" title="Notificaciones"><i data-lucide="bell"></i></button>
+          <button class="notif-btn" id="notifToggle" title="Notificaciones">
+            <i data-lucide="bell"></i>
+            <span class="notification-badge">3</span>
+          </button>
           <div class="notification-popup" id="notificationPopup">
             <div class="notification-item">✅ Iniciaste sesión correctamente</div>
             <div class="notification-item">📢 Nueva actualización disponible</div>
@@ -260,10 +309,10 @@
       <div class="faq">
         <h3>Preguntas Frecuentes</h3>
         <div class="faq-item"><strong>¿Cómo cambio mi contraseña?</strong>Puedes hacerlo desde la sección Configuración &gt; Cambiar contraseña.</div>
-        <div class="faq-item"><strong>¿Cómo reporto un contenedor lleno?</strong>Usa la sección “Contenedores” para marcarlo como lleno o contáctanos directamente.</div>
-        <div class="faq-item"><strong>¿Dónde puedo ver estadísticas de reciclaje?</strong>En la sección “Analítica” puedes visualizar todos los gráficos.</div>
-        <div class="faq-item"><strong>¿Cómo agrego una nueva ubicación?</strong>Desde la sección Ubicaciones, haz clic en “Agregar”.</div>
-        <div class="faq-item"><strong>¿Puedo editar un contenedor existente?</strong>Sí, en la página de Contenedores haz clic en “Editar” al lado del contenedor.</div>
+        <div class="faq-item"><strong>¿Cómo reporto un contenedor lleno?</strong>Usa la sección "Contenedores" para marcarlo como lleno o contáctanos directamente.</div>
+        <div class="faq-item"><strong>¿Dónde puedo ver estadísticas de reciclaje?</strong>En la sección "Analítica" puedes visualizar todos los gráficos.</div>
+        <div class="faq-item"><strong>¿Cómo agrego una nueva ubicación?</strong>Desde la sección Ubicaciones, haz clic en "Agregar".</div>
+        <div class="faq-item"><strong>¿Puedo editar un contenedor existente?</strong>Sí, en la página de Contenedores haz clic en "Editar" al lado del contenedor.</div>
         <div class="faq-item"><strong>¿Cómo activo las notificaciones?</strong>En Configuración &gt; Notificaciones selecciona los canales deseados.</div>
       </div>
 
@@ -289,18 +338,51 @@
 
   <!-- Scripts -->
   <script>
+    // Inicializar iconos
     lucide.createIcons();
+
+    // Toggle menú usuario
     const toggleUser = document.getElementById("toggleUserOptions");
     const userMenu = document.getElementById("userOptions");
 
     toggleUser.addEventListener("click", () => {
       userMenu.style.display = userMenu.style.display === "block" ? "none" : "block";
+      
+      // Cerrar notificaciones si están abiertas
+      notificationPopup.style.display = "none";
     });
-
+    
     document.addEventListener("click", (e) => {
       if (!toggleUser.contains(e.target) && !userMenu.contains(e.target)) {
         userMenu.style.display = "none";
       }
+    });
+
+    // POPUP DE NOTIFICACIONES - IMPLEMENTACIÓN CORRECTA
+    const notifToggle = document.getElementById("notifToggle");
+    const notificationPopup = document.getElementById("notificationPopup");
+    
+    notifToggle.addEventListener("click", (e) => {
+      e.stopPropagation(); // Evitar que el clic se propague
+      notificationPopup.style.display = notificationPopup.style.display === "block" ? "none" : "block";
+      
+      // Cerrar menú usuario si está abierto
+      userMenu.style.display = "none";
+    });
+    
+    // Cerrar notificaciones al hacer clic fuera
+    document.addEventListener("click", (e) => {
+      if (!notifToggle.contains(e.target) && !notificationPopup.contains(e.target)) {
+        notificationPopup.style.display = "none";
+      }
+    });
+    
+    // Cerrar notificaciones al hacer clic en una notificación
+    document.querySelectorAll('.notification-item').forEach(item => {
+      item.addEventListener('click', () => {
+        notificationPopup.style.display = "none";
+        // Aquí podrías añadir lógica para marcar como leída, etc.
+      });
     });
   </script>
 </body>
